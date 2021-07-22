@@ -5,22 +5,22 @@
 
 #define MAX_LEVELS 16
 
-// // one entry of the buddy list
-// typedef struct BuddyListItem {              //da eliminare
-//   ListItem list;
-//   int idx;   // tree index
-//   int level; // level for the buddy
-//   char* start; // start of memory
-//   int size;
-//   struct BuddyListItem* buddy_ptr;
-//   struct BuddyListItem* parent_ptr;
-// } BuddyListItem;
+// one entry of the buddy list
+typedef struct BuddyListItem {              
+  BitMap* bitmap;
+  int idx;   // tree index
+  int level; // level for the buddy
+  char* start; // start of memory
+  int size;
+  // struct BuddyListItem* buddy_ptr;            //in teoria non servono
+  // struct BuddyListItem* parent_ptr;
+} BuddyListItem;
 
 
 typedef struct  {
   BitMap bitmap;
   int num_levels;
-  PoolAllocator list_allocator;
+  PoolAllocator memory_item_allocator;    //ex list_allocator
   char* memory; // the memory area to be managed
   int min_bucket_size; // the minimum page of RAM that can be returned
 } BuddyAllocator;
@@ -34,7 +34,7 @@ typedef struct  {
 void BuddyAllocator_init(BuddyAllocator* alloc,
                          int num_levels,
                          char* buffer,
-                         int buffer_size,
+                         int buffer_size,                        //dovrebbe essere ok
                          char* memory,
                          int min_bucket_size);
 
@@ -49,9 +49,9 @@ BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level);  //da 
 void BuddyAllocator_releaseBuddy(BuddyAllocator* alloc, BuddyListItem* item);   //da modificare per gestire bitmap
 
 //allocates memory
-void* BuddyAllocator_malloc(BuddyAllocator* alloc, int size);   //da modificare per gestire bitmap
+void* BuddyAllocator_malloc(BuddyAllocator* alloc, int size);   //ok
 
 //releases allocated memory
-void BuddyAllocator_free(BuddyAllocator* alloc, void* mem);   //da modificare per gestire bitmap
+void BuddyAllocator_free(BuddyAllocator* alloc, void* mem);   //ok
 
 
