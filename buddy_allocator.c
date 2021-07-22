@@ -76,35 +76,34 @@ void BuddyAllocator_init(BuddyAllocator* alloc,
   alloc->memory=memory;
   alloc->min_bucket_size=min_bucket_size;
   assert (num_levels<MAX_LEVELS);
-  // we need enough memory to handle internal structures
-  assert (buffer_size>=BuddyAllocator_calcSize(num_levels));
+  //controllo che ci sia abbastanza memoria             
+  assert (buffer_size>=BitMap_getBytes(1<<num_levels));
 
-  int list_items=1<<(num_levels+1); // maximum number of allocations, used to size the list
-  int list_alloc_size=(sizeof(BuddyListItem)+sizeof(int))*list_items;
+  int bitmap_items=1<<(num_levels+1); // maximum number of allocations, used to size the list    //ex list_items
+  int bitmap_alloc_size=BitMap_getBytes(bitmap_items);     //bitmap_items=nodi dell'albero      //ex list_alloc_size
 
-  printf("BUDDY INITIALIZING\n");
+  printf("BUDDY_BITMAP INITIALIZING\n");
   printf("\tlevels: %d", num_levels);
-  printf("\tmax list entries %d bytes\n", list_alloc_size);
+  printf("\tmax bitmap entries %d bytes\n", bitmap_alloc_size);
   printf("\tbucket size:%d\n", min_bucket_size);
   printf("\tmanaged memory %d bytes\n", (1<<num_levels)*min_bucket_size);
   
   // the buffer for the list starts where the bitmap ends
-  char *list_start=buffer;
+  char *bitmap_start=buffer;
   PoolAllocatorResult init_result=PoolAllocator_init(&alloc->list_allocator,
 						     sizeof(BuddyListItem),
-						     list_items,
-						     list_start,
-						     list_alloc_size);
+						     bitmap_items,
+						     bitmap_start,
+						     bitmap_alloc_size);
   printf("%s\n",PoolAllocator_strerror(init_result));
 
-  // we initialize all lists
-  for (int i=0; i<MAX_LEVELS; ++i) {
-    List_init(alloc->free+i);
-  }
+  // we initialize all lists //inizializzo la bitmap
+  BitMap_init(alloc->bitmap,bitmap_alloc_siz,buffer );
+  
 
   // we allocate a list_item to mark that there is one "materialized" list
   // in the first block
-  BuddyAllocator_createListItem(alloc, 1, 0);
+  //BuddyAllocator_createListItem(alloc, 1, 0);
 };
 
 

@@ -1,23 +1,24 @@
 #pragma once
 #include "pool_allocator.h"
 #include "linked_list.h"
+#include "bit_map.h"
 
 #define MAX_LEVELS 16
 
-// one entry of the buddy list
-typedef struct BuddyListItem {
-  ListItem list;
-  int idx;   // tree index
-  int level; // level for the buddy
-  char* start; // start of memory
-  int size;
-  struct BuddyListItem* buddy_ptr;
-  struct BuddyListItem* parent_ptr;
-} BuddyListItem;
+// // one entry of the buddy list
+// typedef struct BuddyListItem {              //da eliminare
+//   ListItem list;
+//   int idx;   // tree index
+//   int level; // level for the buddy
+//   char* start; // start of memory
+//   int size;
+//   struct BuddyListItem* buddy_ptr;
+//   struct BuddyListItem* parent_ptr;
+// } BuddyListItem;
 
 
 typedef struct  {
-  ListHead free[MAX_LEVELS];
+  BitMap bitmap;
   int num_levels;
   PoolAllocator list_allocator;
   char* memory; // the memory area to be managed
@@ -25,8 +26,8 @@ typedef struct  {
 } BuddyAllocator;
 
 
-// computes the size in bytes for the buffer of the allocator
-int BuddyAllocator_calcSize(int num_levels);
+// // computes the size in bytes for the buffer of the allocator
+// int BuddyAllocator_calcSize(int num_levels);                       //da eliminare
 
 
 // initializes the buddy allocator, and checks that the buffer is large enough
@@ -40,15 +41,17 @@ void BuddyAllocator_init(BuddyAllocator* alloc,
 // returns (allocates) a buddy at a given level.
 // side effect on the internal structures
 // 0 id no memory available
-BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level);
+BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level);  //da modificare per gestire bitmap
 
 
 // releases an allocated buddy, performing the necessary joins
 // side effect on the internal structures
-void BuddyAllocator_releaseBuddy(BuddyAllocator* alloc, BuddyListItem* item);
+void BuddyAllocator_releaseBuddy(BuddyAllocator* alloc, BuddyListItem* item);   //da modificare per gestire bitmap
 
 //allocates memory
-void* BuddyAllocator_malloc(BuddyAllocator* alloc, int size);
+void* BuddyAllocator_malloc(BuddyAllocator* alloc, int size);   //da modificare per gestire bitmap
 
 //releases allocated memory
-void BuddyAllocator_free(BuddyAllocator* alloc, void* mem);
+void BuddyAllocator_free(BuddyAllocator* alloc, void* mem);   //da modificare per gestire bitmap
+
+
