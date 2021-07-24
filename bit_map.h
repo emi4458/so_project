@@ -17,3 +17,5 @@ int BitMap_getBit(BitMap* bmap, int bit);
 void BitMap_setBit(BitMap* bmap, int bit, int value);
 
 void BitMap_print(BitMap* bmap);
+
+void BitMap_defrag(BitMap* bmap);

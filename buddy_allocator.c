@@ -24,6 +24,21 @@ int startIdx(int idx){
   return (idx-(1<<levelIdx(idx)));
 }
 
+int nBuddyForLevel(int level){
+  return 1<<level;
+}
+
+int firstIdx(int level){
+  return 1<<level;
+}
+
+int emptyIdx(BitMap bitmap, int level){                                     //trova il primo indice vuoto del livello, -1 se non c'è
+  for(int i=nBuddyForLevel(level) ; i<nBuddyForLevel(level)*2 ; i++){
+    if(BitMap_getBit(bitmap,i)==0) return i;                                //testata:funziona
+  }
+  return -1;
+}
+
 
 // computes the size in bytes for the allocator
 int BuddyAllocator_calcSize(int num_levels) {
@@ -113,54 +128,68 @@ BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level){
     return 0;
   assert(level <= alloc->num_levels);
 
-  if (! alloc->free[level].size ) { // no buddies on this level
+  
+
+  if (emptyIdx(alloc->bitmap,level)==-1 ) { // no buddies on this level
     BuddyListItem* parent_ptr=BuddyAllocator_getBuddy(alloc, level-1);
     if (! parent_ptr)
       return 0;
 
-    // parent already detached from free list
-    int left_idx=parent_ptr->idx<<1;
-    int right_idx=left_idx+1;
     
-    printf("split l:%d, left_idx: %d, right_idx: %d\r", level, left_idx, right_idx);
-    BuddyListItem* left_ptr=BuddyAllocator_createListItem(alloc,left_idx, parent_ptr);
-    BuddyListItem* right_ptr=BuddyAllocator_createListItem(alloc,right_idx, parent_ptr);
+
+    // //parent already detached from free list
+    // int left_idx=parent_ptr->idx<<1;             //non so bene a cosa serva
+    // int right_idx=left_idx+1;  
+    
+    //printf("split l:%d, left_idx: %d, right_idx: %d\r", level, left_idx, right_idx);
+    //BuddyListItem* left_ptr=BuddyAllocator_createListItem(alloc,left_idx, parent_ptr);
+    //BuddyListItem* right_ptr=BuddyAllocator_createListItem(alloc,right_idx, parent_ptr);
     // we need to update the buddy ptrs
-    left_ptr->buddy_ptr=right_ptr;
-    right_ptr->buddy_ptr=left_ptr;
+    //left_ptr->buddy_ptr=right_ptr;
+    //right_ptr->buddy_ptr=left_ptr;
   }
+  int idx=emptyIdx(alloc->bitmap,level);
+  BitMap_setBit(alloc->bitmap, idx , 1);        //se è dispari il fratello è idx-1 e il padre idx-2
+  if(idx%2==0){                                 //se è pari il fratello è idx+1 e il padre idx-1
+                                                //RIPRENDI DA QUI//////////////////////////////////////////////////////////
+
+  }
+
   // we detach the first
-  if(alloc->free[level].size) {
-    BuddyListItem* item=(BuddyListItem*)List_popFront(alloc->free+level);
-    return item;
-  }
+  // if(alloc->free[level].size) {
+  //   BuddyListItem* item=(BuddyListItem*)List_popFront(alloc->free+level);
+  //   return item;
+  // }
   assert(0);
   return 0;
 }
 
 void BuddyAllocator_releaseBuddy(BuddyAllocator* alloc, BuddyListItem* item){
 
-  BuddyListItem* parent_ptr=item->parent_ptr;
-  BuddyListItem *buddy_ptr=item->buddy_ptr;
+  // BuddyListItem* parent_ptr=item->parent_ptr;
+  // BuddyListItem *buddy_ptr=item->buddy_ptr;
   
   // buddy back in the free list of its level
-  List_pushFront(&alloc->free[item->level],(ListItem*)item);
+  //List_pushFront(&alloc->free[item->level],(ListItem*)item);
 
   // if on top of the chain, do nothing
-  if (! parent_ptr)
-    return;
+  // if (! parent_ptr)
+  //   return;
   
   // if the buddy of this item is not free, we do nothing
-  if (buddy_ptr->list.prev==0 && buddy_ptr->list.next==0) 
-    return;
+  // if (buddy_ptr->list.prev==0 && buddy_ptr->list.next==0) 
+  //   return;
   
   //join
   //1. we destroy the two buddies in the free list;
-  printf("merge %d\n", item->level);
-  BuddyAllocator_destroyListItem(alloc, item);
-  BuddyAllocator_destroyListItem(alloc, buddy_ptr);
-  //2. we release the parent
-  BuddyAllocator_releaseBuddy(alloc, parent_ptr);
+  // printf("merge %d\n", item->level);
+  // BuddyAllocator_destroyListItem(alloc, item);
+  // BuddyAllocator_destroyListItem(alloc, buddy_ptr);
+  // //2. we release the parent
+  // BuddyAllocator_releaseBuddy(alloc, parent_ptr);
+
+  BitMap_setBit(alloc->bitmap,item->idx,0);
+  BitMap_defrag(bitmap);
 
 }
 
