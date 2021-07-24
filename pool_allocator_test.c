@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "pool_allocator.h"
 
 // object size=4K
 # define item_size 4096
 
-// 1024 blocks
+// 16 blocks
 #define num_items 16
 
 // buffer should contain also bookkeeping information
@@ -27,34 +28,34 @@ int main(int argc, char** argv) {
   // we allocate_all memory, and a bit more
   
   void* blocks[num_items+10];
+  
   for (int i=0; i<num_items+10; ++i){
     void* block=PoolAllocator_getBlock(&allocator);
     blocks[i]=block;
     printf("allocation %d, block %p, size%d\n", i, block, allocator.size);  
   }
-
+  
   // we release all memory
   for (int i=0; i<num_items+10; ++i){
     void* block=blocks[i];
-    if (block){
-      printf("releasing... idx: %d, block %p, free %d ... ",
-	     i, block, allocator.size);
-      PoolAllocatorResult release_result=PoolAllocator_releaseBlock(&allocator, block);
-      printf("%s\n", PoolAllocator_strerror(release_result));
-    }
+    printf("releasing... idx: %d, block %p, free %d ... ",
+	   i, block, allocator.size);
+    PoolAllocatorResult release_result=PoolAllocator_releaseBlock(&allocator, block);
+    printf("%s\n", PoolAllocator_strerror(release_result));
   }
 
   // we release all memory again (should get a bunch of errors)
   for (int i=0; i<num_items+10; ++i){
     void* block=blocks[i];
-    if (block){
-      printf("releasing... idx: %d, block %p, free %d ... ",
-	     i, block, allocator.size);
-      PoolAllocatorResult release_result=PoolAllocator_releaseBlock(&allocator, block);
-      printf("%s\n", PoolAllocator_strerror(release_result));
-    }
+    printf("releasing... idx: %d, block %p, free %d ... ",
+	   i, block, allocator.size);
+    PoolAllocatorResult release_result=PoolAllocator_releaseBlock(&allocator, block);
+    printf("%s\n", PoolAllocator_strerror(release_result));
   }
-  
+
+  for (int i = 0; i < num_items; ++i) {
+    blocks[i] = 0;
+  }
   // we allocate half of the memory, and release it in reverse order
   for (int i=0; i<num_items-5; ++i){
     void* block=PoolAllocator_getBlock(&allocator);

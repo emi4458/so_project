@@ -31,5 +31,7 @@ int main(int argc, char** argv) {
   BuddyAllocator_free(&alloc, p1);
   BuddyAllocator_free(&alloc, p2);
   BuddyAllocator_free(&alloc, p3);
-  
+  void* p5=BuddyAllocator_malloc(&alloc, 100000000);
+  printf("%d\n",p5);
+ 
 }

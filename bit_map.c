@@ -1,36 +1,49 @@
 #include <assert.h>
 #include "bit_map.h"
+#include<stdlib.h>
 
-// returns the number of bytes to store bits booleans
-int BitMap_getBytes(int bits){
-  return bits/8 + (bits%8)!=0;
+
+void BitMap_alloc(BitMap* bmap, int num_bits) {
+  int num_bytes=(num_bits/8)+((num_bits%8)>0);
+  bmap->num_bits=num_bits;
+  bmap->num_bytes=num_bytes;
+  bmap->data=(uint8_t*) malloc(num_bytes);
+  memset(bmap->data, 0, num_bytes);
 }
 
-// initializes a bitmap on an external array
-void BitMap_init(BitMap* bit_map, int num_bits, uint8_t* buffer){
-  bit_map->buffer=buffer;
-  bit_map->num_bits=num_bits;
-  bit_map->buffer_size=BitMap_getBytes(num_bits);
+void BitMap_free(BitMap* bmap, int num_bits) {
+  bmap->num_bits=0;
+  bmap->num_bytes=0;
+  if(bmap->data)
+    free(bmap->data);
+  bmap->data=0;
 }
 
-// sets a the bit bit_num in the bitmap
-// status= 0 or 1
-void BitMap_setBit(BitMap* bit_map, int bit_num, int status){
-  // get byte
-  int byte_num=bit_num>>3;
-  assert(byte_num<bit_map->buffer_size);
-  int bit_in_byte=byte_num&0x03;
-  if (status) {
-    bit_map->buffer[byte_num] |= (1<<bit_in_byte);
+int BitMap_getBit(BitMap* bmap, int bit) {
+  assert(bit<bmap->num_bits);
+  int byte=bit/8;
+  int bit_in_byte=bit%8;
+  return (bmap->data[byte]&(1<<bit_in_byte))>0;
+  
+}
+
+void BitMap_setBit(BitMap* bmap, int bit, int value) {
+  assert(bit<bmap->num_bits);
+  int byte=bit/8;
+  int bit_in_byte=bit%8;
+  uint8_t mask=1<<bit_in_byte;
+  if (value) {
+    bmap->data[byte]|=mask;
   } else {
-    bit_map->buffer[byte_num] &= ~(1<<bit_in_byte);
+    bmap->data[byte]&=(~mask);
   }
 }
 
-// inspects the status of the bit bit_num
-int BitMap_bit(const BitMap* bit_map, int bit_num){
-  int byte_num=bit_num>>3; 
-  assert(byte_num<bit_map->buffer_size);
-  int bit_in_byte=byte_num&0x03;
-  return (bit_map->buffer[byte_num] & (1<<bit_in_byte))!=0;
+void BitMap_print(BitMap* bmap) {
+  printf("BMap [ ptr: %xl, n_bytes: %d, n_bits: %d]\n[",
+         bmap, bmap->num_bytes, bmap->num_bits);
+  for(int i=0; i<bmap->num_bits; ++i) {
+    printf("%d",  BitMap_getBit(bmap, i));
+  }
+  printf("]\n");
 }

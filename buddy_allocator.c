@@ -24,29 +24,28 @@ int startIdx(int idx){
   return (idx-(1<<levelIdx(idx)));
 }
 
-   //calcolo l indice all'interno della bitmap
-   int BitMap_getIdx(int level,int idx){
 
-   }
-
-// // computes the size in bytes for the allocator
-// int BuddyAllocator_calcSize(int num_levels) {
-//   int list_items=1<<(num_levels+1); // maximum number of allocations, used to determine the max list items   //da eliminare
-//   int list_alloc_size=(sizeof(BuddyListItem)+sizeof(int))*list_items;
-//   return list_alloc_size;
-// }
+// computes the size in bytes for the allocator
+int BuddyAllocator_calcSize(int num_levels) {
+  int list_items=1<<(num_levels+1); // maximum number of allocations, used to determine the max list items
+  int list_alloc_size=(sizeof(BuddyListItem)+sizeof(int))*list_items;
+  return list_alloc_size;
+}
 
 // creates an item from the index
 // and puts it in the corresponding list
 BuddyListItem* BuddyAllocator_createListItem(BuddyAllocator* alloc,
                                              int idx,
-                                             ){
-  BuddyListItem* item=(BuddyListItem*)PoolAllocator_getBlock(&alloc->memory_item_allocator);
+                                             BuddyListItem* parent_ptr){
+  BuddyListItem* item=(BuddyListItem*)PoolAllocator_getBlock(&alloc->list_allocator);
   item->idx=idx;
   item->level=levelIdx(idx);
-  item->start= alloc->memory + ((idx-(1<<levelIdx(idx))) << (alloc->num_levels-item->level) )*alloc->min_bucket_size;   //ok
+  item->start= alloc->memory + ((idx-(1<<levelIdx(idx))) << (alloc->num_levels-item->level) )*
+    alloc->min_bucket_size;
   item->size=(1<<(alloc->num_levels-item->level))*alloc->min_bucket_size;
-  BitMap_setBit(&alloc->bitmap,idx,1);
+  item->parent_ptr=parent_ptr;
+  item->buddy_ptr=0;
+  List_pushBack(&alloc->free[item->level],(ListItem*)item);
   printf("Creating Item. idx:%d, level:%d, start:%p, size:%d\n", 
          item->idx, item->level, item->start, item->size);
   return item;
@@ -55,10 +54,10 @@ BuddyListItem* BuddyAllocator_createListItem(BuddyAllocator* alloc,
 // detaches and destroys an item in the free lists 
 void BuddyAllocator_destroyListItem(BuddyAllocator* alloc, BuddyListItem* item){
   int level=item->level;
-  BitMap_setBit(&alloc->bitmap, item->idx,0);
-  printf("Destroying Item. level:%d, idx:%d, start:%p, size:%d\n",                                      //ok
+  List_detach(&alloc->free[level], (ListItem*)item);
+  printf("Destroying Item. level:%d, idx:%d, start:%p, size:%d\n",
          item->level, item->idx, item->start, item->size);
-  PoolAllocatorResult release_result=PoolAllocator_releaseBlock(&alloc->memory_item_allocator, item);
+  PoolAllocatorResult release_result=PoolAllocator_releaseBlock(&alloc->list_allocator, item);
   assert(release_result==Success);
 
 };
@@ -77,38 +76,39 @@ void BuddyAllocator_init(BuddyAllocator* alloc,
   alloc->memory=memory;
   alloc->min_bucket_size=min_bucket_size;
   assert (num_levels<MAX_LEVELS);
-  //controllo che ci sia abbastanza memoria             
-  assert (buffer_size>=BitMap_getBytes(1<<num_levels));
+  // we need enough memory to handle internal structures
+  assert (buffer_size>=BuddyAllocator_calcSize(num_levels));
 
-  int bitmap_items=(1<<(num_levels+1))-1; // maximum number of allocations, used to size the list    //ex list_items
-  int bitmap_alloc_size=BitMap_getBytes(bitmap_items);     //bitmap_items=nodi dell'albero      //ex list_alloc_size
+  int list_items=1<<(num_levels+1); // maximum number of allocations, used to size the list
+  int list_alloc_size=(sizeof(BuddyListItem)+sizeof(int))*list_items;
 
-  printf("BUDDY_BITMAP INITIALIZING\n");
+  printf("BUDDY INITIALIZING\n");
   printf("\tlevels: %d", num_levels);
-  printf("\tmax bitmap entries %d bytes\n", bitmap_alloc_size);
+  printf("\tmax list entries %d bytes\n", list_alloc_size);
   printf("\tbucket size:%d\n", min_bucket_size);
   printf("\tmanaged memory %d bytes\n", (1<<num_levels)*min_bucket_size);
   
   // the buffer for the list starts where the bitmap ends
-  char *bitmap_start=buffer;
-  PoolAllocatorResult init_result=PoolAllocator_init(&alloc->memory_item_allocator,
+  char *list_start=buffer;
+  PoolAllocatorResult init_result=PoolAllocator_init(&alloc->list_allocator,
 						     sizeof(BuddyListItem),
-						     bitmap_items,
-						     bitmap_start,
-						     bitmap_alloc_size);
+						     list_items,
+						     list_start,
+						     list_alloc_size);
   printf("%s\n",PoolAllocator_strerror(init_result));
 
-   //inizializzo la bitmap
-  BitMap_init(alloc->bitmap,bitmap_alloc_siz,buffer );
-  
+  // we initialize all lists
+  for (int i=0; i<MAX_LEVELS; ++i) {
+    List_init(alloc->free+i);
+  }
 
   // we allocate a list_item to mark that there is one "materialized" list
-  // in the first block                                                       //non ho capito a cosa serve
-  //BuddyAllocator_createListItem(alloc, 1, 0);
+  // in the first block
+  BuddyAllocator_createListItem(alloc, 1, 0);
 };
 
 
-BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level){       //da fare dopo studio
+BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level){
   if (level<0)
     return 0;
   assert(level <= alloc->num_levels);
@@ -123,8 +123,8 @@ BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level){       
     int right_idx=left_idx+1;
     
     printf("split l:%d, left_idx: %d, right_idx: %d\r", level, left_idx, right_idx);
-    BuddyListItem* left_ptr=BuddyAllocator_createListItem(alloc,left_idx   );
-    BuddyListItem* right_ptr=BuddyAllocator_createListItem(alloc,right_idx   );
+    BuddyListItem* left_ptr=BuddyAllocator_createListItem(alloc,left_idx, parent_ptr);
+    BuddyListItem* right_ptr=BuddyAllocator_createListItem(alloc,right_idx, parent_ptr);
     // we need to update the buddy ptrs
     left_ptr->buddy_ptr=right_ptr;
     right_ptr->buddy_ptr=left_ptr;
@@ -167,11 +167,11 @@ void BuddyAllocator_releaseBuddy(BuddyAllocator* alloc, BuddyListItem* item){
 //allocates memory
 void* BuddyAllocator_malloc(BuddyAllocator* alloc, int size) {
   // we determine the level of the page
-  int mem_size=(1<<alloc->num_levels)*alloc->min_bucket_size;           //ok
+  int mem_size=(1<<alloc->num_levels)*alloc->min_bucket_size;
   int  level=floor(log2(mem_size/(size+8)));
 
   // if the level is too small, we pad it to max
-  if (level>alloc->num_levels)                                          //ok
+  if (level>alloc->num_levels)
     level=alloc->num_levels;
 
   printf("requested: %d bytes, level %d \n",
@@ -187,8 +187,8 @@ void* BuddyAllocator_malloc(BuddyAllocator* alloc, int size) {
   *target=buddy;
   return buddy->start+8;
 }
-//releases allocated memory                                             
-void BuddyAllocator_free(BuddyAllocator* alloc, void* mem) {                  //seems ok
+//releases allocated memory
+void BuddyAllocator_free(BuddyAllocator* alloc, void* mem) {
   printf("freeing %p", mem);
   // we retrieve the buddy from the system
   char* p=(char*) mem;

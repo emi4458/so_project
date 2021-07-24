@@ -2,21 +2,18 @@
 #include <stdint.h>
 
 // simple bit array
-typedef struct  {
-  uint8_t *buffer;  // externally allocated buffer
-  int buffer_size;
-  int num_bits; 
+typedef struct {
+  int num_bits;
+  int num_bytes;
+  uint8_t * data;
 } BitMap;
 
-// returns the number of bytes to store bits booleans
-int BitMap_getBytes(int bits);
+void BitMap_alloc(BitMap* bmap, int num_bits);
 
-// initializes a bitmap on an external array
-void BitMap_init(BitMap* bit_map, int num_bits, uint8_t* buffer);
+void BitMap_free(BitMap* bmap, int num_bits);
 
-// sets a the bit bit_num in the bitmap
-// status= 0 or 1
-void BitMap_setBit(BitMap* bit_map, int bit_num, int status);
+int BitMap_getBit(BitMap* bmap, int bit);
 
-// inspects the status of the bit bit_num
-int BitMap_bit(const BitMap* bit_map, int bit_num);
+void BitMap_setBit(BitMap* bmap, int bit, int value);
+
+void BitMap_print(BitMap* bmap);
