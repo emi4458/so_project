@@ -2,9 +2,9 @@
 #include <stdio.h>
 
 
-#define BUFFER_SIZE 1024 //102400
+#define BUFFER_SIZE 102400
 #define BUDDY_LEVELS 4
-#define MEMORY_SIZE 1024 //(1024*1024)
+#define MEMORY_SIZE (1024*1024)
 #define MIN_BUCKET_SIZE (MEMORY_SIZE>>(BUDDY_LEVELS))
 
 char buffer[BUFFER_SIZE]; // 100 Kb buffer to handle memory should be enough
@@ -58,13 +58,28 @@ int main(int argc, char** argv) {
   BuddyAllocator_malloc(&alloc,100);
   BitMap_print(&(alloc.bitmap));
   printf("RICHIEDO UN NODO TROPPO GRANDE\n");
-  BuddyAllocator_malloc(&alloc,10000000000000000000000);
+  //BuddyAllocator_malloc(&alloc,10000000000000000000000);
   printf("RILASCIO DUE VOLTE LO STESSO (NODO 8)\n");
   BuddyAllocator_free(&alloc,array[5]);
   BuddyAllocator_free(&alloc,array[5]);
 
+  for (int j=0;j<8;j++){  
+    BuddyAllocator_free(&alloc,array[j]);
+  }
 
+  // for(int i=0;i<9;i++){
+  //   array[i]=BuddyAllocator_malloc(&alloc,200000);
+  //   BitMap_print(&(alloc.bitmap));
+  // }
+  //int* a=(int*)malloc(sizeof(int)*2);
 
-
+  BuddyAllocator_malloc(&alloc,200000);
+  BitMap_print(&(alloc.bitmap));
+  BuddyAllocator_malloc(&alloc,200000);
+  BitMap_print(&(alloc.bitmap));
+  BuddyAllocator_malloc(&alloc,200000);
+  BitMap_print(&(alloc.bitmap));
+  BuddyAllocator_malloc(&alloc,200000);
+  BitMap_print(&(alloc.bitmap));
  
 }

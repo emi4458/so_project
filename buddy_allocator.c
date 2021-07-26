@@ -83,7 +83,7 @@ void BuddyAllocator_init(BuddyAllocator* alloc,
   alloc->num_levels=num_levels;
   alloc->memory=memory;
   alloc->min_bucket_size=min_bucket_size;
-  BitMap_alloc(&(alloc->bitmap),1<<(num_levels+1));
+  BitMap_alloc(&(alloc->bitmap),(1<<(num_levels+1))-1);
   assert (num_levels<MAX_LEVELS);
 
   int list_items=1<<(num_levels+1); // maximum number of allocations, used to size the list
@@ -110,7 +110,7 @@ BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level){
   if (level<0)
     return 0;
   assert(level <= alloc->num_levels);
-  printf("il primo indirizzo libero al livello %d è %d \n",level,emptyIdx(&(alloc->bitmap),level));
+  printf("il primo indirizzo libero al livello %d è %d \n",level,emptyIdx(&(alloc->bitmap),level)+1);
   if (emptyIdx(&(alloc->bitmap),level)==-1 ) { // no buddies on this level
     //printf("non ci sono buddy in questo livello");
     BuddyListItem* parent_ptr=BuddyAllocator_getBuddy(alloc, level-1);
@@ -126,6 +126,21 @@ BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level){
     BitMap_setBit(&(alloc->bitmap), parentIdx(idx_temp),1);
     idx_temp=parentIdx(idx_temp);
   }
+  //int idx2=idx;
+  int z=2;
+  for(int idx2=idx*2+1;z+idx2<=alloc->bitmap.num_bits;idx2=(idx2*2)+1){         //setto tutti i bit dei figli a 1
+    for(int i=0;i<z;i++){
+      BitMap_setBit(&(alloc->bitmap),i+idx2,1);
+    }
+    z*=2;
+    
+  }
+
+
+// for(int i=idx2;i<(idx2+1)*2;i++){
+//       BitMap_setBit(&(alloc->bitmap),i+1,1);
+//     }  
+
   //printf("\n indirizzo temp: %d    idx= %d",idx_temp,idx);
   BuddyListItem* item=BuddyAllocator_createListItem(alloc,idx);
   return item;
@@ -182,6 +197,6 @@ void BuddyAllocator_free(BuddyAllocator* alloc, void* mem) {
   // sanity check;
   assert(buddy->start==p);
   BuddyAllocator_releaseBuddy(alloc, buddy);
-  
+  //int* a=(int*)malloc(sizeof(int)*2);
 }
 

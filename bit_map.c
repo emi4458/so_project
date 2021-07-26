@@ -65,7 +65,7 @@ int levelBuddy(int idx){
 
 void print_used_idx(BitMap* bitmap){    //stampa gli indici occupati
   printf("INDICI OCCUPATI: ");
-  for(int i=0;i<bitmap->num_bits;i++){
+  for(int i=0; i<bitmap->num_bits;i++){
     if(BitMap_getBit(bitmap,i)==1) printf("%d ",i+1); 
   }
   printf("\n\n");
