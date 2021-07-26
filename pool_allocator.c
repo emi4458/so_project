@@ -1,9 +1,6 @@
 #include "pool_allocator.h"
 #include "bit_map.h"
 
-static const int NullIdx=-1;
-static const int DetachedIdx=-2;
-
 static const char* PoolAllocator_strerrors[]=
   {"Success",
    "NotEnoughMemory",
@@ -35,17 +32,7 @@ PoolAllocatorResult PoolAllocator_init(PoolAllocator* a,
   a->size=num_items;
   a->buffer_size=item_size*num_items;
   a->size_max = num_items;
-  
-  a->buffer=memory_block; // the upper part of the buffer is used as memory
-  //a->free_list= (int*)(memory_block+item_size*num_items); // the lower part is for bookkeeping
-
-  // // now we populate the free list by constructing a linked list
-  // for (int i=0; i<a->size-1; ++i){
-  //   a->free_list[i]=i+1;
-  // }
-  // // set the last element to "NULL" 
-  // a->free_list[a->size-1] = NullIdx;
-  // a->first_idx=0;
+  a->buffer=memory_block; 
   return Success;
 }
 
@@ -85,7 +72,7 @@ PoolAllocatorResult PoolAllocator_releaseBlock(PoolAllocator* a, void* block_){
   return Success;
 }
 
-int firstFreeIdx(BitMap* bitmap){              //trova il primo indice a 0, -1 se piena
+int firstFreeIdx(BitMap* bitmap){              //trova il primo indice libero (a 0), -1 se piena
   for(int i=0;i<bitmap->num_bits;i++){
     if(BitMap_getBit(bitmap,i)==0) return i;
   }

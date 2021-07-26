@@ -12,16 +12,13 @@ typedef enum {
 typedef struct PoolAllocator{
   
   char* buffer;        //contiguous buffer managed by the system
-  //int*  free_list;     //list of linked objects
   int buffer_size;     //size of the buffer in bytes
 
   int size;            //number of free blocks
   int size_max;        //maximum number of blocks
   int item_size;       //size of a block
   
-  //int first_idx;       //pointer to the first bucket
-  //int bucket_size;     // size of a bucket
-  BitMap bitmap;
+  BitMap bitmap;       //bitmap al posto della lista
 } PoolAllocator;
 
 PoolAllocatorResult PoolAllocator_init(PoolAllocator* allocator,
@@ -36,4 +33,4 @@ PoolAllocatorResult PoolAllocator_releaseBlock(PoolAllocator* allocator, void* b
 			
 const char* PoolAllocator_strerror(PoolAllocatorResult result);
 
-int firstFreeIdx(BitMap* bitmap);
+int firstFreeIdx(BitMap* bitmap); //trova il primo indice libero (a 0), -1 se piena
