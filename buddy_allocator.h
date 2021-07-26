@@ -7,7 +7,6 @@
 
 // one entry of the buddy list
 typedef struct BuddyListItem {
-  BitMap bitmap;                         //sostituisco la lista con la bitmap
   int idx;   // tree index
   int level; // level for the buddy
   char* start; // start of memory
@@ -18,7 +17,7 @@ typedef struct BuddyListItem {
 
 
 typedef struct  {
-  //ListHead free[MAX_LEVELS];         //non serve
+  BitMap bitmap;            //sostituisco la lista con la bitmap
   int num_levels;
   PoolAllocator list_allocator;
   char* memory; // the memory area to be managed
@@ -33,8 +32,6 @@ int BuddyAllocator_calcSize(int num_levels);
 // initializes the buddy allocator, and checks that the buffer is large enough
 void BuddyAllocator_init(BuddyAllocator* alloc,
                          int num_levels,
-                         char* buffer,
-                         int buffer_size,
                          char* memory,
                          int min_bucket_size);
 

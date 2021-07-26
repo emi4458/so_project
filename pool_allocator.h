@@ -1,4 +1,5 @@
 #pragma once
+#include "bit_map.h"
 
 typedef enum {
   Success=0x0,
@@ -11,15 +12,16 @@ typedef enum {
 typedef struct PoolAllocator{
   
   char* buffer;        //contiguous buffer managed by the system
-  int*  free_list;     //list of linked objects
+  //int*  free_list;     //list of linked objects
   int buffer_size;     //size of the buffer in bytes
 
   int size;            //number of free blocks
   int size_max;        //maximum number of blocks
   int item_size;       //size of a block
   
-  int first_idx;       //pointer to the first bucket
-  int bucket_size;     // size of a bucket
+  //int first_idx;       //pointer to the first bucket
+  //int bucket_size;     // size of a bucket
+  BitMap bitmap;
 } PoolAllocator;
 
 PoolAllocatorResult PoolAllocator_init(PoolAllocator* allocator,
@@ -33,3 +35,5 @@ void* PoolAllocator_getBlock(PoolAllocator* allocator);
 PoolAllocatorResult PoolAllocator_releaseBlock(PoolAllocator* allocator, void* block);
 			
 const char* PoolAllocator_strerror(PoolAllocatorResult result);
+
+int firstFreeIdx(BitMap* bitmap);

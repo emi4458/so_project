@@ -1,9 +1,12 @@
 #include <assert.h>
 #include "bit_map.h"
-#include<stdlib.h>
-
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
 
 void BitMap_alloc(BitMap* bmap, int num_bits) {
+  printf("\nalloco la bitmap con %d numero di bits\n",num_bits);
   int num_bytes=(num_bits/8)+((num_bits%8)>0);
   bmap->num_bits=num_bits;
   bmap->num_bytes=num_bytes;
@@ -20,7 +23,7 @@ void BitMap_free(BitMap* bmap, int num_bits) {
 }
 
 int BitMap_getBit(BitMap* bmap, int bit) {
-  bit--;
+  //bit--;
   assert(bit<bmap->num_bits);
   int byte=bit/8;
   int bit_in_byte=bit%8;
@@ -29,7 +32,7 @@ int BitMap_getBit(BitMap* bmap, int bit) {
 }
 
 void BitMap_setBit(BitMap* bmap, int bit, int value) {
-  bit--;
+  //bit--;
   assert(bit<bmap->num_bits);
   int byte=bit/8;
   int bit_in_byte=bit%8;
@@ -50,21 +53,11 @@ void BitMap_print(BitMap* bmap) {
   printf("]\n");
 }
 
-void BitMap_defrag(BitMap* bmap){
-  int n=0;
-  for(int i=2;i<bmap->num_bits;i*=2){
-    for(int j=0;j<nBuddyForLevel(levelBuddy(i));j++)
-      if(BitMap_getBit(bmap,i+j)==0 && BitMap_getBit(bmap,i+j+1)==0){
-        BitMap_setBit(bmap,i+j/2,0);
-    }
-  }
-}
 
+// int nBuddyForLevel(int level){
+//   return 1<<level;
+// }
 
-int nBuddyForLevel(int level){
-  return 1<<level;
-}
-
-int levelBuddy(idx){
-  floor(log2(idx));
+int levelBuddy(int idx){
+  return floor(log2(idx));
 }

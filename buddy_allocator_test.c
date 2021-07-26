@@ -1,6 +1,7 @@
 #include "buddy_allocator.h"
 #include <stdio.h>
 
+
 #define BUFFER_SIZE 102400
 #define BUDDY_LEVELS 9
 #define MEMORY_SIZE (1024*1024)
@@ -19,8 +20,6 @@ int main(int argc, char** argv) {
   //2 we initialize the allocator
   printf("init... ");
   BuddyAllocator_init(&alloc, BUDDY_LEVELS,
-                      buffer,
-                      BUFFER_SIZE,
                       memory,
                       MIN_BUCKET_SIZE);
   printf("DONE\n");
