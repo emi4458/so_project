@@ -18,3 +18,4 @@ void BitMap_setBit(BitMap* bmap, int bit, int value);
 
 void BitMap_print(BitMap* bmap);
 
+void print_used_idx(BitMap* bitmap);    //stampa gli indici occupati

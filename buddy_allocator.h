@@ -32,6 +32,8 @@ int BuddyAllocator_calcSize(int num_levels);
 // initializes the buddy allocator, and checks that the buffer is large enough
 void BuddyAllocator_init(BuddyAllocator* alloc,
                          int num_levels,
+                         char* buffer,
+                         int buffer_size,
                          char* memory,
                          int min_bucket_size);
 
@@ -50,3 +52,5 @@ void* BuddyAllocator_malloc(BuddyAllocator* alloc, int size);
 
 //releases allocated memory
 void BuddyAllocator_free(BuddyAllocator* alloc, void* mem);
+
+

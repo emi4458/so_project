@@ -51,6 +51,7 @@ void BitMap_print(BitMap* bmap) {
     printf("%d",  BitMap_getBit(bmap, i));
   }
   printf("]\n");
+  print_used_idx(bmap);
 }
 
 
@@ -60,4 +61,12 @@ void BitMap_print(BitMap* bmap) {
 
 int levelBuddy(int idx){
   return floor(log2(idx));
+}
+
+void print_used_idx(BitMap* bitmap){    //stampa gli indici occupati
+  printf("INDICI OCCUPATI: ");
+  for(int i=0;i<bitmap->num_bits;i++){
+    if(BitMap_getBit(bitmap,i)==1) printf("%d ",i+1); 
+  }
+  printf("\n\n");
 }
