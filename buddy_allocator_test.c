@@ -3,7 +3,7 @@
 
 
 #define BUFFER_SIZE 102400
-#define BUDDY_LEVELS 4
+#define BUDDY_LEVELS 9
 #define MEMORY_SIZE (1024*1024)
 #define MIN_BUCKET_SIZE (MEMORY_SIZE>>(BUDDY_LEVELS))
 
@@ -19,67 +19,56 @@ int main(int argc, char** argv) {
 
   //2 we initialize the allocator
   printf("init... ");
-  BuddyAllocator_init(&alloc, BUDDY_LEVELS,
+  BuddyAllocator_init(&alloc, 
+                      BUDDY_LEVELS,
                       buffer,
                       BUFFER_SIZE,
                       memory,
                       MIN_BUCKET_SIZE);
   printf("DONE\n");
 
-  // void* p1=BuddyAllocator_malloc(&alloc, 100);
-  // BitMap_print(&(alloc.bitmap));
-  // void* p2=BuddyAllocator_malloc(&alloc, 100);
-  // BitMap_print(&(alloc.bitmap));
-  
-  // //void* p3=BuddyAllocator_malloc(&alloc, 100000);
-  // BitMap_print(&(alloc.bitmap));
-  
-  // BuddyAllocator_free(&alloc, p1);
-  // BitMap_print(&(alloc.bitmap));
- 
-  // BuddyAllocator_free(&alloc, p2);
-  // BitMap_print(&(alloc.bitmap));
-  
-  // //BuddyAllocator_free(&alloc, p3);
-  // BitMap_print(&(alloc.bitmap));
-  // void* p5=BuddyAllocator_malloc(&alloc, 100000000);
-  // printf("%d\n",p5);
+  printf("\n******************************************************CHIEDO E RILASCIO MEMORIA LIVELLO 0******************************************************\n");
 
-  void ** array[10];
-  for(int i=0;i<8;i++){
-    array[i]=BuddyAllocator_malloc(&alloc,100);
-  }
+  void* m0=BuddyAllocator_malloc(&alloc,100000);
   BitMap_print(&(alloc.bitmap));
-  printf("LIBERO INDICE 12 E 13, QUINDI ANCHE IL 6");
-  BuddyAllocator_free(&alloc,array[4]);
-  BuddyAllocator_free(&alloc,array[5]);
-  BitMap_print(&(alloc.bitmap));
-  printf("RICHIEDO UN NODO AL LIVELLO 4\n");
-  BuddyAllocator_malloc(&alloc,100);
-  BitMap_print(&(alloc.bitmap));
-  printf("RICHIEDO UN NODO TROPPO GRANDE\n");
-  //BuddyAllocator_malloc(&alloc,10000000000000000000000);
-  printf("RILASCIO DUE VOLTE LO STESSO (NODO 8)\n");
-  BuddyAllocator_free(&alloc,array[5]);
-  BuddyAllocator_free(&alloc,array[5]);
+  BuddyAllocator_free(&alloc,m0);
 
-  for (int j=0;j<8;j++){  
-    BuddyAllocator_free(&alloc,array[j]);
-  }
+  // printf("\n******************************************************LIBERO LIVELLO 0******************************************************\n");
 
-  // for(int i=0;i<9;i++){
-  //   array[i]=BuddyAllocator_malloc(&alloc,200000);
+  
+  // BuddyAllocator_free(&alloc,m);
+  
+  // BitMap_print(&(alloc.bitmap));
+
+  printf("\n******************************************************RIEMPIMENTO E SVUOTAMENTO INVERSO******************************************************\n");
+
+  // void ** array[16];                                  //riempio e svuoto l'albero in ordine inverso
+  // for(int i=0;i<16;i++){
+  //   array[i]=BuddyAllocator_malloc(&alloc,800000);
   //   BitMap_print(&(alloc.bitmap));
   // }
-  //int* a=(int*)malloc(sizeof(int)*2);
+  // for(int j=15;j>=0;j--){
+  //   BuddyAllocator_free(&alloc,array[j]);
+  //   BitMap_print(&(alloc.bitmap));
+  // }
 
-  BuddyAllocator_malloc(&alloc,200000);
+  printf("\n******************************************************RIEMPIO L'ALBERO******************************************************\n");
+
+  // for(int i=0;i<16;i++){                              //riempio in modo casuale l albero
+  //   array[i]=BuddyAllocator_malloc(&alloc,100000);
+  // }
+  // BitMap_print(&(alloc.bitmap));
+
+  printf("\n******************************************************SVUOTAMENTO RANDOM******************************************************\n");
+
+  // for(int i=0;i<16;i++){                              //riempio in modo casuale l albero
+  //   int random = rand() % 16 + 0;
+  //   printf("Tolgo il nodo: %d",random+16);
+  //   BuddyAllocator_free(&alloc,array[random]);
+  //   BitMap_print(&(alloc.bitmap));
+  // }
+
+
+  void* m1=BuddyAllocator_malloc(&alloc,4000000);
   BitMap_print(&(alloc.bitmap));
-  BuddyAllocator_malloc(&alloc,200000);
-  BitMap_print(&(alloc.bitmap));
-  BuddyAllocator_malloc(&alloc,200000);
-  BitMap_print(&(alloc.bitmap));
-  BuddyAllocator_malloc(&alloc,200000);
-  BitMap_print(&(alloc.bitmap));
- 
 }

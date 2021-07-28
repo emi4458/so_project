@@ -32,7 +32,8 @@ int main(int argc, char** argv) {
   for (int i=0; i<num_items+10; ++i){
     void* block=PoolAllocator_getBlock(&allocator);
     blocks[i]=block;
-    printf("allocation %d, block %p, size%d\n", i, block, allocator.size);  
+    printf("allocation %d, block %p, size%d\n", i, block, allocator.size); 
+    BitMap_print(&(allocator.bitmap)); 
   }
   
   // we release all memory
@@ -42,6 +43,7 @@ int main(int argc, char** argv) {
 	   i, block, allocator.size);
     PoolAllocatorResult release_result=PoolAllocator_releaseBlock(&allocator, block);
     printf("%s\n", PoolAllocator_strerror(release_result));
+    BitMap_print(&(allocator.bitmap));
   }
 
   // we release all memory again (should get a bunch of errors)
@@ -51,6 +53,7 @@ int main(int argc, char** argv) {
 	   i, block, allocator.size);
     PoolAllocatorResult release_result=PoolAllocator_releaseBlock(&allocator, block);
     printf("%s\n", PoolAllocator_strerror(release_result));
+    //BitMap_print(&(allocator.bitmap));
   }
 
   for (int i = 0; i < num_items; ++i) {
@@ -61,6 +64,7 @@ int main(int argc, char** argv) {
     void* block=PoolAllocator_getBlock(&allocator);
     blocks[i]=block;
     printf("allocation %d, block %p, size%d\n", i, block, allocator.size);  
+    //BitMap_print(&(allocator.bitmap));
   }
 
   for (int i=num_items-1; i>=0; --i){

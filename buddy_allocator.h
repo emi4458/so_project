@@ -7,12 +7,13 @@
 
 // one entry of the buddy list
 typedef struct BuddyListItem {
+  //ListItem list;
   int idx;   // tree index
   int level; // level for the buddy
   char* start; // start of memory
   int size;
-  // struct BuddyListItem* buddy_ptr;     //non dovrebbero servire
-  // struct BuddyListItem* parent_ptr;
+  //struct BuddyListItem* buddy_ptr;     //non dovrebbero servire
+  //struct BuddyListItem* parent_ptr;
 } BuddyListItem;
 
 

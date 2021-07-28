@@ -29,8 +29,8 @@ PoolAllocatorResult PoolAllocator_init(PoolAllocator* a,
 
   BitMap_alloc(&(a->bitmap),num_items);
   a->item_size=item_size;
-  a->size=num_items;
-  a->buffer_size=item_size*num_items;
+  a->size=num_items;                     
+  a->buffer_size=item_size*num_items+1; //ho dovuto mettere +1
   a->size_max = num_items;
   a->buffer=memory_block; 
   return Success;
