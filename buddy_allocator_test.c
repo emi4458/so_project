@@ -3,7 +3,7 @@
 
 
 #define BUFFER_SIZE 102400
-#define BUDDY_LEVELS 9
+#define BUDDY_LEVELS 4
 #define MEMORY_SIZE (1024*1024)
 #define MIN_BUCKET_SIZE (MEMORY_SIZE>>(BUDDY_LEVELS))
 
@@ -29,9 +29,12 @@ int main(int argc, char** argv) {
 
   printf("\n******************************************************CHIEDO E RILASCIO MEMORIA LIVELLO 0******************************************************\n");
 
-  void* m0=BuddyAllocator_malloc(&alloc,100000);
+  void* m0=BuddyAllocator_malloc(&alloc,530000);
   BitMap_print(&(alloc.bitmap));
+  void* m2=BuddyAllocator_malloc(&alloc,530000);
   BuddyAllocator_free(&alloc,m0);
+  BitMap_print(&(alloc.bitmap));
+  
 
   // printf("\n******************************************************LIBERO LIVELLO 0******************************************************\n");
 
