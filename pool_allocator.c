@@ -1,5 +1,6 @@
 #include "pool_allocator.h"
 #include "bit_map.h"
+#include <stdio.h>
 
 static const char* PoolAllocator_strerrors[]=
   {"Success",
@@ -30,7 +31,7 @@ PoolAllocatorResult PoolAllocator_init(PoolAllocator* a,
   BitMap_alloc(&(a->bitmap),num_items);
   a->item_size=item_size;
   a->size=num_items;                     
-  a->buffer_size=item_size*num_items+1; //ho dovuto mettere +1
+  a->buffer_size=item_size*num_items; 
   a->size_max = num_items;
   a->buffer=memory_block; 
   return Success;
@@ -39,10 +40,12 @@ PoolAllocatorResult PoolAllocator_init(PoolAllocator* a,
 void* PoolAllocator_getBlock(PoolAllocator* a) {
   
   int free=firstFreeIdx(&(a->bitmap));
+  //printf("free è: %d\n",free);
   if(free==-1) return 0;
   --a->size;
   BitMap_setBit(&(a->bitmap),free,1);
   char* block_address=a->buffer+(free*a->item_size);
+  //printf("a->buffer= %p   block_address= %p \n",a->buffer,block_address);
   return block_address;
   
 }
@@ -51,12 +54,14 @@ PoolAllocatorResult PoolAllocator_releaseBlock(PoolAllocator* a, void* block_){
   //we need to find the index from the address
   char* block=(char*) block_;
   int offset=block - a->buffer;
-
+  printf("a->buffer= %p   block_address= %p  block_: %p\n",a->buffer,block,block_);
   //sanity check, we need to be aligned to the block boundaries
   if (offset%a->item_size)
     return UnalignedFree;
 
   int idx=offset/a->item_size;
+  printf("IL NOSTROIDX È %d l'offset è %d\n",idx,offset);                                  //RIPRENDI DA QUI
+  
 
   //sanity check, are we inside the buffer?
   if (idx<0 || idx>=a->size_max)
