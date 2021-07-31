@@ -69,41 +69,23 @@ int main(int argc, char** argv) {
 
   for(int i=0;i<16;i++){
     array[i]=BuddyAllocator_malloc(&alloc,10);
-    BitMap_print(&(alloc.bitmap));
-    printf("indici pool impegnati:\n");
-    BitMap_print(&(alloc.list_allocator.bitmap));
   }
   BitMap_print(&(alloc.bitmap));
 
-  printf("\n******************************************************SVUOTAMENTO RANDOM******************************************************\n");
+  printf("\n******************************************************RIMPIMENTO X10******************************************************\n");
 
-  for(int i=0;i<16;i++){                              //svuoto in modo casuale l albero
-    int random = rand() % 16 + 0;
-    printf("random: %d \n",random);
-    printf("Tolgo il nodo: %d\n",random+16);
-    BuddyAllocator_free(&alloc,array[random]);
+  
+  for(int j=0;j<10;j++){
+    for(int i=0;i<16;i++){
+      array[i]=BuddyAllocator_malloc(&alloc,10);
+    }
     BitMap_print(&(alloc.bitmap));
   }
 
-  // void* mm=BuddyAllocator_malloc(&alloc,10);
-  // BitMap_print(&(alloc.bitmap));
-  // printf("stato pool:\n");
-  // BitMap_print(&(alloc.list_allocator.bitmap));
+  printf("\n******************************************************SVUOTAMENTO...******************************************************\n");
 
-  // void* mm1=BuddyAllocator_malloc(&alloc,10);
-  // BitMap_print(&(alloc.bitmap));
-  // printf("stato pool:\n");
-  // BitMap_print(&(alloc.list_allocator.bitmap));
-
-  // BuddyAllocator_free(&alloc,mm1);
-  // BitMap_print(&(alloc.bitmap));
-  // printf("stato pool:\n");
-  // BitMap_print(&(alloc.list_allocator.bitmap));
-
-  // BuddyAllocator_free(&alloc,mm);
-  // BitMap_print(&(alloc.bitmap));
-  // printf("stato pool:\n");
-  // BitMap_print(&(alloc.list_allocator.bitmap));
-
-  
+  for(int i=0;i<16;i++){
+    BuddyAllocator_free(&alloc,array[i]);
+  }
+  BitMap_print(&(alloc.bitmap));
 }

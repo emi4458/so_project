@@ -34,7 +34,6 @@ PoolAllocatorResult PoolAllocator_init(PoolAllocator* a,
   a->buffer_size=item_size*num_items; 
   a->size_max = num_items;
   a->buffer=memory_block; 
-  printf("I BLOCCHI DEL POOLALLOCATOR SONO DA: %d IL BUFFER È DA: %d\n",a->item_size, a->buffer_size);
   return Success;
 }
 
@@ -55,13 +54,13 @@ PoolAllocatorResult PoolAllocator_releaseBlock(PoolAllocator* a, void* block_){
   //we need to find the index from the address
   char* block=(char*) block_;
   int offset=block - a->buffer;
-  printf("a->buffer= %p   block_address= %p  block_: %p\n",a->buffer,block,block_);
+  //printf("a->buffer= %p   block_address= %p  block_: %p\n",a->buffer,block,block_);
   //sanity check, we need to be aligned to the block boundaries
   if (offset%a->item_size)
     return UnalignedFree;
 
   int idx=offset/a->item_size;
-  printf("IL NOSTROIDX È %d l'offset è %d\n",idx,offset);                               
+  //printf("IL NOSTROIDX È %d l'offset è %d\n",idx,offset);                               
   
 
   //sanity check, are we inside the buffer?
