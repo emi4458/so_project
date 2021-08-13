@@ -54,11 +54,6 @@ void BitMap_print(BitMap* bmap) {
   print_used_idx(bmap);
 }
 
-
-// int nBuddyForLevel(int level){
-//   return 1<<level;
-// }
-
 int levelBuddy(int idx){
   return floor(log2(idx));
 }

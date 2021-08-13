@@ -51,8 +51,8 @@ int main(int argc, char** argv) {
     void* x=BuddyAllocator_malloc(&alloc,10);
     array[i]=x;
     BitMap_print(&(alloc.bitmap));
-    printf("stato pool:\n");
-    BitMap_print(&(alloc.list_allocator.bitmap));
+    // printf("stato pool:\n");
+    // BitMap_print(&(alloc.list_allocator.bitmap));
     
   }
   for(int j=15;j>=0;j--){
@@ -60,8 +60,8 @@ int main(int argc, char** argv) {
     void* y=array[j];
     BuddyAllocator_free(&alloc,y);          
     BitMap_print(&(alloc.bitmap));
-    printf("stato pool:\n");
-    BitMap_print(&(alloc.list_allocator.bitmap));
+    // printf("stato pool:\n");
+    // BitMap_print(&(alloc.list_allocator.bitmap));
     
   }
 
@@ -72,12 +72,12 @@ int main(int argc, char** argv) {
   }
   BitMap_print(&(alloc.bitmap));
 
-  printf("\n******************************************************RIMPIMENTO X10******************************************************\n");
+  printf("\n******************************************************RIEMPIMENTO X10 SU ALBERO GIÀ PIENO******************************************************\n");
 
   
   for(int j=0;j<10;j++){
     for(int i=0;i<16;i++){
-      array[i]=BuddyAllocator_malloc(&alloc,10);
+      BuddyAllocator_malloc(&alloc,10);
     }
     BitMap_print(&(alloc.bitmap));
   }
