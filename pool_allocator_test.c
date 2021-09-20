@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     void* block=PoolAllocator_getBlock(&allocator);
     blocks[i]=block;
     printf("allocation %d, block %p, size%d\n", i, block, allocator.size); 
-    ////BitMap_print(&(allocator.bitmap)); 
+    //BitMap_print(&(allocator.bitmap)); 
   }
   
   // we release all memory

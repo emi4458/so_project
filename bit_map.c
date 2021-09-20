@@ -23,16 +23,13 @@ void BitMap_free(BitMap* bmap, int num_bits) {
 }
 
 int BitMap_getBit(BitMap* bmap, int bit) {
-  //bit--;
   assert(bit<bmap->num_bits);
   int byte=bit/8;
   int bit_in_byte=bit%8;
-  return (bmap->data[byte]&(1<<bit_in_byte))>0;
-  
+  return (bmap->data[byte]&(1<<bit_in_byte))>0; 
 }
 
 void BitMap_setBit(BitMap* bmap, int bit, int value) {
-  //bit--;
   assert(bit<bmap->num_bits);
   int byte=bit/8;
   int bit_in_byte=bit%8;

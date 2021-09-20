@@ -4,7 +4,7 @@
 
 #define BUFFER_SIZE 102400
 #define BUDDY_LEVELS 4
-#define MEMORY_SIZE (1024*1024)
+#define MEMORY_SIZE (1024*1024) //1 048 576
 #define MIN_BUCKET_SIZE (MEMORY_SIZE>>(BUDDY_LEVELS))
 
 char buffer[BUFFER_SIZE]; // 100 Kb buffer to handle memory should be enough
@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 
   printf("\n******************************************************CHIEDO E RILASCIO MEMORIA LIVELLO 0******************************************************\n");
 
-  void* m0=BuddyAllocator_malloc(&alloc,530000);
+  void* m0=BuddyAllocator_malloc(&alloc,1000000);
   BitMap_print(&(alloc.bitmap));
   BuddyAllocator_free(&alloc,m0);
   BitMap_print(&(alloc.bitmap));
@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
   printf("\n******************************************************CHIEDO E RILASCIO MEMORIA LIVELLO 1******************************************************\n");
 
   
-  void* m1=BuddyAllocator_malloc(&alloc,280000);
+  void* m1=BuddyAllocator_malloc(&alloc,500000);
   BitMap_print(&(alloc.bitmap));
   BuddyAllocator_free(&alloc,m1);
   BitMap_print(&(alloc.bitmap));
@@ -47,12 +47,11 @@ int main(int argc, char** argv) {
 
   void* array[600];                                  //riempio e svuoto l'albero in ordine inverso
   for(int i=0;i<16;i++){
-    
     void* x=BuddyAllocator_malloc(&alloc,10);
     array[i]=x;
     BitMap_print(&(alloc.bitmap));
     // printf("stato pool:\n");
-    // BitMap_print(&(alloc.list_allocator.bitmap));
+    // BitMap_print(&(alloc.p_allocator.bitmap));
     
   }
   for(int j=15;j>=0;j--){
@@ -61,7 +60,7 @@ int main(int argc, char** argv) {
     BuddyAllocator_free(&alloc,y);          
     BitMap_print(&(alloc.bitmap));
     // printf("stato pool:\n");
-    // BitMap_print(&(alloc.list_allocator.bitmap));
+    // BitMap_print(&(alloc.p_allocator.bitmap));
     
   }
 

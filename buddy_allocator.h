@@ -5,21 +5,18 @@
 #define MAX_LEVELS 16
 
 // one entry of the buddy list
-typedef struct BuddyListItem {
-  //ListItem list;
+typedef struct MemoryItem {
   int idx;   // tree index
   int level; // level for the buddy
   char* start; // start of memory
   int size;
-  //struct BuddyListItem* buddy_ptr;     //non dovrebbero servire
-  //struct BuddyListItem* parent_ptr;
-} BuddyListItem;
+} MemoryItem;
 
 
 typedef struct  {
   BitMap bitmap;            //sostituisco la lista con la bitmap
   int num_levels;
-  PoolAllocator list_allocator;
+  PoolAllocator p_allocator;
   char* memory; // the memory area to be managed
   int min_bucket_size; // the minimum page of RAM that can be returned
 } BuddyAllocator;
@@ -40,12 +37,12 @@ void BuddyAllocator_init(BuddyAllocator* alloc,
 // returns (allocates) a buddy at a given level.
 // side effect on the internal structures
 // 0 id no memory available
-BuddyListItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level);
+MemoryItem* BuddyAllocator_getBuddy(BuddyAllocator* alloc, int level);
 
 
 // releases an allocated buddy, performing the necessary joins
 // side effect on the internal structures
-void BuddyAllocator_releaseBuddy(BuddyAllocator* alloc, BuddyListItem* item);
+void BuddyAllocator_releaseBuddy(BuddyAllocator* alloc, MemoryItem* item);
 
 //allocates memory
 void* BuddyAllocator_malloc(BuddyAllocator* alloc, int size);

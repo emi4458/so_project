@@ -38,7 +38,6 @@ PoolAllocatorResult PoolAllocator_init(PoolAllocator* a,
 }
 
 void* PoolAllocator_getBlock(PoolAllocator* a) {
-  
   int free=firstFreeIdx(&(a->bitmap));
   //printf("free è: %d\n",free);
   if(free==-1) return 0;
@@ -47,7 +46,6 @@ void* PoolAllocator_getBlock(PoolAllocator* a) {
   char* block_address=a->buffer+(free*a->item_size);
   //printf("a->buffer= %p   block_address= %p \n",a->buffer,block_address);
   return block_address;
-  
 }
 
 PoolAllocatorResult PoolAllocator_releaseBlock(PoolAllocator* a, void* block_){
@@ -59,10 +57,7 @@ PoolAllocatorResult PoolAllocator_releaseBlock(PoolAllocator* a, void* block_){
   if (offset%a->item_size)
     return UnalignedFree;
 
-  int idx=offset/a->item_size;
-  //printf("IL NOSTROIDX È %d l'offset è %d\n",idx,offset);                               
-  
-
+  int idx=offset/a->item_size;                            
   //sanity check, are we inside the buffer?
   if (idx<0 || idx>=a->size_max)
     return OutOfRange;
