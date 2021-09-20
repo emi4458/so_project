@@ -2,17 +2,15 @@
 
 Progetto sistemi operativi 
 
--Buddy allocator using bitmap: Sono state modificate le strutture del buddy allocator e del pool allocator per funzionare senza l’utilizzo di liste e alberi implementandola solamente con l’uso di bitmap.
-L’albero rappresentato dalla bitmap è numerato partendo dall’indice 1 e gestito in modo tale che nel momento in cui viene utilizzato un nodo vengano occupati anche i corrispettivi figli e genitori.
+-Buddy allocator using bitmap: Sono state modificate le strutture di buddy allocator e di pool allocator viste a lezione per funzionare senza l’utilizzo di liste e di alberi implementandola solamente con l’uso di bitmap.
+La gestione della memoria di buddy allocator è implementata tramite una bitmap che rappresenta un albero numerato partendo dall’indice 1. 
+Sono state aggiunte delle brevi funzioni utili per gestire la bitmap e i rispettivi indici nell’albero. La maggior parte delle funzioni originali e delle strutture sono state modificate e adattate. 
 
+In buddy_allocator_test viene testato il funzionamento del buddy allocator tramite delle richieste di diverso tipo, ordine e dimensione.  Viene effettuata una richiesta di memoria al livello 0 dell’albero e poi rilasciata, stessa cosa con il livello 1. Successivamente viene richiesta memoria al livello più basso fino a riempire l’albero e poi rilasciata in ordine inverso. Infine dopo aver riempito nuovamente l’albero viene richiesta ulteriore memoria, ci aspettiamo quindi di ricevere degli errori.
+Le funzioni di test sono le stesse del codice originale: BuddyAllocator_malloc e BuddyAllocator_free. Bitmap_print stampa lo stato della bitmap.
 
-In buddy_allocat_test viene testato il funzionamento del buddy allocator tramite delle richieste di diverso tipo, ordine e dimensione. 
-Viene allocata memoria tramite void* BuddyAllocator_malloc(BuddyAllocator* alloc, int size);
-
-Viene rilasciata la memoria con void BuddyAllocator_free(BuddyAllocator* alloc, void* mem);
-
-Dopo ogni operazione viene stampata la bitmap per controllarne lo stato  tramite la funzione  void BitMap_print(BitMap* bmap);
-
+Per provare il codice è sufficiente eseguire make e successivamente il file buddy_allocator_test.
+Il programma stamperà lo stato della bitmap ad ogni operazione così da poterne verificare lo stato.
 
 
 
