@@ -1,6 +1,6 @@
 # so_project
 
-Progetto sistemi operativi 
+Progetto esame sistemi operativi 
 
 -Buddy allocator using bitmap: Sono state modificate le strutture di buddy allocator e di pool allocator viste a lezione per funzionare senza l’utilizzo di liste e di alberi implementandola solamente con l’uso di bitmap.
 La gestione della memoria di buddy allocator è implementata tramite una bitmap che rappresenta un albero numerato partendo dall’indice 1. 
